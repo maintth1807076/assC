@@ -1,10 +1,9 @@
-
 #include <stdio.h>
 #include <string.h>
 
 typedef struct {
     char id[20];
-    char name[50];
+    char name[20];
     char phone[20];
 } SinhVien;
 
@@ -17,11 +16,11 @@ void menu() {
     printf("5. Thoát chương trình.\n");
 }
 
-void themMoiSinhVien(SinhVien *p) {
+void themMoiSinhVien(int index, SinhVien sinhvien[]) {
     printf("Vui lòng nhập mã sinh viên: ");
     while (1 == 1) {
-        scanf("%s[^\n]", p->id);
-        if (strlen(p->id) < 5) {
+        scanf("%s[^\n]", sinhvien[index].id);
+        if (strlen(sinhvien[index].id) != 5) {
             printf("Mã sinh viên chưa đủ 5 kí tự\n");
             printf("Vui lòng nhập lại mã sinh viên: ");
         } else
@@ -29,55 +28,34 @@ void themMoiSinhVien(SinhVien *p) {
     }
     fgetc(stdin);
     printf("Vui lòng nhập tên sinh viên: ");
-    scanf("%[^\t\n]", p->name);
+    scanf("%[^\t\n]", sinhvien[index].name);
     fgetc(stdin);
     printf("Vui lòng nhập số điện thoại sinh viên: ");
-    scanf("%[^\n]", p->phone);
+    scanf("%[^\n]", sinhvien[index].phone);
     fgetc(stdin);
 }
 
-void hienThiDanhSach(int dem1, SinhVien *p) {
+void hienThiDanhSach(int dem, SinhVien sinhvien[]) {
     printf("%-20s%-5s%-20s%-5s%-20s\n", "Mã sinh viên", "|", "Tên sinh viên", "|", "Số điện thoại");
-    dem1++;
-    for (int i = 0; i < dem1; ++i) {
-        printf("%-18s%-5s%-20s%-5s%-20s\n", p->id, "|", p->name, "|", p->phone);
-        p--;
-    }
-    dem1++;
-    for (int j = 0; j < dem1; ++j) {
-        p++;
+    for (int i = 0; i < dem; ++i) {
+        printf("%-18s%-5s", sinhvien[i].id, "|");
+        printf("%-20s%-5s", sinhvien[i].name, "|");
+        printf("%-20s\n", sinhvien[i].phone);
     }
 }
 
-void luuDanhSach(int dem1, SinhVien *p) {
-  if (p == NULL){
-      p--;
-      FILE *fp = fopen("danhsachsinhvien.txt", "w+");
-      fprintf(fp, "Mã sinh viên      |    Tên sinh viên     |    Số điện thoại\n");
-      for (int i = 0; i < dem1; ++i) {
-          fprintf(fp, p->id);
-          fprintf(fp, "             |    ");
-          fprintf(fp, p->name);
-          fprintf(fp, "    |    ");
-          fprintf(fp, p->phone);
-          fprintf(fp, "\n");
-          p--;
-      }
-      fclose(fp);
-  } else {
-      FILE *fp = fopen("danhsachsinhvien.txt", "w+");
-      fprintf(fp, "Mã sinh viên      |    Tên sinh viên     |    Số điện thoại\n");
-      for (int i = 0; i < dem1; ++i) {
-          fprintf(fp, p->id);
-          fprintf(fp, "             |    ");
-          fprintf(fp, p->name);
-          fprintf(fp, "    |    ");
-          fprintf(fp, p->phone);
-          fprintf(fp, "\n");
-          p--;
-      }
-      p++;
-  }
+void luuDanhSach(int dem, SinhVien sinhvien[]) {
+    FILE *fp = fopen("danhsachsinhvien.txt", "w+");
+    fprintf(fp, "Mã sinh viên      |    Tên sinh viên     |    Số điện thoại\n");
+    for (int i = 0; i < dem; ++i) {
+        fprintf(fp, sinhvien[i].id);
+        fprintf(fp, "             |    ");
+        fprintf(fp, sinhvien[i].name);
+        fprintf(fp, "    |    ");
+        fprintf(fp, sinhvien[i].phone);
+        fprintf(fp, "\n");
+    }
+    fclose(fp);
 }
 
 void docDanhSach() {
@@ -90,40 +68,38 @@ void docDanhSach() {
 }
 
 int main() {
-    int size = 10; //Số lượng sinh viên
+    menu();
+    int size =10;
     SinhVien sinhvien[size];
-    SinhVien *p = sinhvien;
+    int index = 0;
     int choice;
-    int dem = 0; //Đếm số lần chọn choice 1
     while (1 == 1) {
-        menu();
         printf("Vui lòng nhập lựa chọn của bạn là: ");
         scanf("%d", &choice);
         if (choice == 1) {
             printf("Thêm mới sinh viên.\n");
-            themMoiSinhVien(p);
-            p++;
-            dem++;
-            if (dem == 4) {
+            themMoiSinhVien(index, sinhvien);
+            index++;
+            if (index == 10) {
                 printf("Danh sách đã đầy.");
                 break;
             }
         }
-        int dem1 = dem;
+        int dem = index; //Biến dem đếm số lần nhập
         if (choice == 2) {
             printf("Hiển thị danh sách sinh viên.\n");
-            hienThiDanhSach(dem1, p);
+            hienThiDanhSach(dem, sinhvien);
         }
         if (choice == 3) {
             printf("Lưu danh sách sinh viên ra file.\n");
-            luuDanhSach(dem1, p);
+            luuDanhSach(dem, sinhvien);
         }
         if (choice == 4) {
             printf("Đọc danh sách sinh viên từ file.\n");
             docDanhSach();
         }
         if (choice == 5) {
-            printf("Thoát chương trình.\n");
+            printf("Thoát chương trình\n");
             break;
         }
     }
